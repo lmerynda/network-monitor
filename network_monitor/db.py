@@ -22,8 +22,9 @@ class ProbeRecord:
 
 class Database:
     def __init__(self, path: Path) -> None:
+        self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
-        self.conn = sqlite3.connect(path, check_same_thread=False)
+        self.conn = sqlite3.connect(path)
         self.conn.row_factory = sqlite3.Row
         self._init_schema()
 
@@ -270,3 +271,6 @@ class Database:
             (since_ts,),
         )
         return list(cur.fetchall())
+
+    def close(self) -> None:
+        self.conn.close()

@@ -22,12 +22,11 @@ class DashboardConfig:
 
 
 def run_dashboard(config: MonitorConfig, host: str = "0.0.0.0", port: int = 8080) -> None:
-    db = Database(config.db_path)
-    server = ThreadingHTTPServer((host, port), _build_handler(db))
+    server = ThreadingHTTPServer((host, port), _build_handler(config.db_path))
     server.serve_forever()
 
 
-def _build_handler(db: Database) -> type[BaseHTTPRequestHandler]:
+def _build_handler(db_path: Path) -> type[BaseHTTPRequestHandler]:
     class DashboardHandler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
             parsed = urlparse(self.path)
@@ -42,19 +41,19 @@ def _build_handler(db: Database) -> type[BaseHTTPRequestHandler]:
                 self._serve_static("styles.css", "text/css; charset=utf-8")
                 return
             if path == "/api/status":
-                self._serve_json(_status_payload(db))
+                self._with_db(_status_payload)
                 return
             if path == "/api/incidents":
                 hours = _read_hours(parsed.query, default=24)
-                self._serve_json(_incidents_payload(db, hours))
+                self._with_db(lambda db: _incidents_payload(db, hours))
                 return
             if path == "/api/timeline":
                 hours = _read_hours(parsed.query, default=24)
-                self._serve_json(_timeline_payload(db, hours))
+                self._with_db(lambda db: _timeline_payload(db, hours))
                 return
             if path == "/api/discovered":
                 limit = _read_limit(parsed.query, default=50, max_value=500)
-                self._serve_json(_discovered_payload(db, limit))
+                self._with_db(lambda db: _discovered_payload(db, limit))
                 return
             self.send_error(HTTPStatus.NOT_FOUND)
 
@@ -76,6 +75,14 @@ def _build_handler(db: Database) -> type[BaseHTTPRequestHandler]:
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        def _with_db(self, fn) -> None:
+            db = Database(db_path)
+            try:
+                payload = fn(db)
+            finally:
+                db.close()
+            self._serve_json(payload)
 
     return DashboardHandler
 
