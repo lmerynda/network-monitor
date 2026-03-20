@@ -27,10 +27,30 @@ SQLite keeps raw history queryable without introducing a separate service. It is
 3. Run:
 
 ```bash
-python3 -m network_monitor.main --config config.json
+python3 -m network_monitor.main --config config.json run
 ```
 
 The monitor creates the SQLite database on first run.
+
+## CLI
+
+Show recent cycle summaries:
+
+```bash
+python3 -m network_monitor.main --config config.json status --limit 20
+```
+
+Show recent non-healthy cycles:
+
+```bash
+python3 -m network_monitor.main --config config.json incidents --limit 20
+```
+
+Show probe rows from the latest cycle:
+
+```bash
+python3 -m network_monitor.main --config config.json probes --cycles 1
+```
 
 ## Default Behavior
 

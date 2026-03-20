@@ -167,3 +167,46 @@ class Database:
             """
         )
         return list(cur.fetchall())
+
+    def get_recent_cycles(self, limit: int = 20) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            SELECT ts, classification, gateway_ok, upstream_ok, internet_icmp_ok, dns_ok, http_ok
+            FROM cycle_summaries
+            ORDER BY ts DESC
+            LIMIT ?
+            """,
+            (limit,),
+        )
+        return list(cur.fetchall())
+
+    def get_recent_incidents(self, limit: int = 20) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            SELECT ts, classification, gateway_ok, upstream_ok, internet_icmp_ok, dns_ok, http_ok
+            FROM cycle_summaries
+            WHERE classification != 'healthy'
+            ORDER BY ts DESC
+            LIMIT ?
+            """,
+            (limit,),
+        )
+        return list(cur.fetchall())
+
+    def get_latest_probe_results(self, cycle_limit: int = 1) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            SELECT pr.ts, pr.target_name, pr.target_address, pr.target_kind, pr.probe_type,
+                   pr.success, pr.latency_ms, pr.details_json
+            FROM probe_results pr
+            WHERE pr.cycle_id IN (
+                SELECT cycle_id
+                FROM cycle_summaries
+                ORDER BY ts DESC
+                LIMIT ?
+            )
+            ORDER BY pr.ts DESC, pr.target_kind, pr.target_name, pr.probe_type
+            """,
+            (cycle_limit,),
+        )
+        return list(cur.fetchall())
