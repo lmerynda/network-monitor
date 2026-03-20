@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Network Monitor</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Home Network Monitor</p>
+          <h1>Ryszardyna Health</h1>
+          <p class="lede">Live path visibility for the mesh router, first upstream hop, internet checks, and discovered LAN devices.</p>
+        </div>
+        <div class="hero-status">
+          <div id="overall-pill" class="pill pill-neutral">Loading</div>
+          <div id="overall-ts" class="muted"></div>
+        </div>
+      </section>
+
+      <section class="grid top-grid">
+        <article class="card">
+          <h2>Current Checks</h2>
+          <div id="status-cards" class="status-cards"></div>
+        </article>
+        <article class="card">
+          <div class="section-head">
+            <h2>Recent Incidents</h2>
+            <label class="picker">Window
+              <select id="incident-hours">
+                <option value="6">6h</option>
+                <option value="24" selected>24h</option>
+                <option value="72">72h</option>
+              </select>
+            </label>
+          </div>
+          <div id="incidents" class="incident-list"></div>
+        </article>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h2>Timeline</h2>
+          <label class="picker">Window
+            <select id="timeline-hours">
+              <option value="6">6h</option>
+              <option value="24" selected>24h</option>
+              <option value="72">72h</option>
+            </select>
+          </label>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </section>
+
+      <section class="grid bottom-grid">
+        <article class="card">
+          <h2>Latest Probe Details</h2>
+          <div id="probes" class="table-wrap"></div>
+        </article>
+        <article class="card">
+          <h2>Discovered Devices</h2>
+          <div id="devices" class="table-wrap"></div>
+        </article>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+  </html>

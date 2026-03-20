@@ -1,0 +1,16 @@
+[Unit]
+Description=Home network monitor dashboard
+After=network-online.target network-monitor.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/network-monitor
+ExecStart=/usr/bin/python3 -m network_monitor.main --config /etc/network-monitor/config.json serve --host 0.0.0.0 --port 8080
+Restart=always
+RestartSec=5
+User=network-monitor
+Group=network-monitor
+
+[Install]
+WantedBy=multi-user.target

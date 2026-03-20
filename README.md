@@ -61,7 +61,7 @@ The installer:
 - copies the app to `/opt/network-monitor`
 - installs config to `/etc/network-monitor/config.json` if missing
 - stores data in `/var/lib/network-monitor`
-- installs a `systemd` service
+- installs monitor and dashboard `systemd` services
 - creates `/usr/local/bin/network-monitor`
 - enables and starts the service
 
@@ -91,6 +91,12 @@ Show discovered LAN devices:
 python3 -m network_monitor.main --config /etc/network-monitor/config.json discovered --limit 50
 ```
 
+Run the local dashboard server manually:
+
+```bash
+python3 -m network_monitor.main --config /etc/network-monitor/config.json serve --host 0.0.0.0 --port 8080
+```
+
 ## Default Behavior
 
 - Probe interval: 10 seconds
@@ -109,4 +115,20 @@ It falls back to the built-in ping scan if `nmap` is unavailable.
 
 ## Systemd
 
-The installed service runs from [systemd/network-monitor.service](/repos/network-monitor/systemd/network-monitor.service).
+The installed services run from [systemd/network-monitor.service](/repos/network-monitor/systemd/network-monitor.service) and [systemd/network-monitor-dashboard.service](/repos/network-monitor/systemd/network-monitor-dashboard.service).
+
+## Dashboard
+
+After install, open:
+
+```text
+http://<raspberry-pi-ip>:8080/
+```
+
+The dashboard shows:
+
+- current overall classification and latest probe latencies
+- incident cards for recent non-healthy windows
+- a multi-lane timeline for gateway, upstream, ICMP, DNS, and HTTP
+- the latest probe detail table
+- discovered devices from LAN scans

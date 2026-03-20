@@ -223,3 +223,50 @@ class Database:
             (limit,),
         )
         return list(cur.fetchall())
+
+    def get_latest_cycle(self) -> sqlite3.Row | None:
+        cur = self.conn.execute(
+            """
+            SELECT cycle_id, ts, classification, gateway_ok, upstream_ok, internet_icmp_ok, dns_ok, http_ok
+            FROM cycle_summaries
+            ORDER BY ts DESC
+            LIMIT 1
+            """
+        )
+        return cur.fetchone()
+
+    def get_latest_probes_for_cycle(self, cycle_id: str) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            SELECT ts, target_name, target_address, target_kind, probe_type, success, latency_ms, details_json
+            FROM probe_results
+            WHERE cycle_id = ?
+            ORDER BY target_kind, target_name, probe_type
+            """,
+            (cycle_id,),
+        )
+        return list(cur.fetchall())
+
+    def get_cycle_summaries_since(self, since_ts: str) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            SELECT cycle_id, ts, classification, gateway_ok, upstream_ok, internet_icmp_ok, dns_ok, http_ok
+            FROM cycle_summaries
+            WHERE ts >= ?
+            ORDER BY ts ASC
+            """,
+            (since_ts,),
+        )
+        return list(cur.fetchall())
+
+    def get_probe_results_since(self, since_ts: str) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            SELECT ts, cycle_id, target_name, target_address, target_kind, probe_type, success, latency_ms, details_json
+            FROM probe_results
+            WHERE ts >= ?
+            ORDER BY ts ASC, target_kind, target_name, probe_type
+            """,
+            (since_ts,),
+        )
+        return list(cur.fetchall())

@@ -8,6 +8,7 @@ CONFIG_DIR="/etc/${APP_NAME}"
 DATA_DIR="/var/lib/${APP_NAME}"
 BIN_PATH="/usr/local/bin/${APP_NAME}"
 SERVICE_PATH="/etc/systemd/system/${APP_NAME}.service"
+DASHBOARD_SERVICE_PATH="/etc/systemd/system/${APP_NAME}-dashboard.service"
 SERVICE_USER="network-monitor"
 SERVICE_GROUP="network-monitor"
 
@@ -45,6 +46,7 @@ install_files() {
   fi
 
   cp systemd/network-monitor.service "${SERVICE_PATH}"
+  cp systemd/network-monitor-dashboard.service "${DASHBOARD_SERVICE_PATH}"
 
   cat > "${BIN_PATH}" <<'EOF'
 #!/usr/bin/env bash
@@ -56,14 +58,15 @@ EOF
 
 fix_permissions() {
   chown -R "${SERVICE_USER}:${SERVICE_GROUP}" "${INSTALL_DIR}" "${DATA_DIR}"
-  chown root:root "${CONFIG_DIR}" "${CONFIG_DIR}/config.json" "${SERVICE_PATH}" "${BIN_PATH}"
+  chown root:root "${CONFIG_DIR}" "${CONFIG_DIR}/config.json" "${SERVICE_PATH}" "${DASHBOARD_SERVICE_PATH}" "${BIN_PATH}"
   chmod 755 "${INSTALL_DIR}" "${CONFIG_DIR}" "${DATA_DIR}"
-  chmod 644 "${CONFIG_DIR}/config.json" "${SERVICE_PATH}"
+  chmod 644 "${CONFIG_DIR}/config.json" "${SERVICE_PATH}" "${DASHBOARD_SERVICE_PATH}"
 }
 
 reload_service() {
   systemctl daemon-reload
   systemctl enable --now "${APP_NAME}.service"
+  systemctl enable --now "${APP_NAME}-dashboard.service"
 }
 
 main() {
@@ -77,6 +80,7 @@ main() {
   echo "Config: ${CONFIG_DIR}/config.json"
   echo "Data: ${DATA_DIR}/network-monitor.sqlite3"
   echo "Status: systemctl status ${APP_NAME}"
+  echo "Dashboard: http://$(hostname -I | awk '{print $1}'):8080/"
   echo "CLI: ${BIN_PATH} status --limit 10"
 }
 
