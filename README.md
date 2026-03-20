@@ -16,7 +16,7 @@ SQLite keeps raw history queryable without introducing a separate service. It is
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.10+
 - Linux with `ping` and `ip`
 - Raspberry Pi connected to the `ryszardyna` network
 
@@ -85,15 +85,27 @@ Show probe rows from the latest cycle:
 python3 -m network_monitor.main --config /etc/network-monitor/config.json probes --cycles 1
 ```
 
+Show discovered LAN devices:
+
+```bash
+python3 -m network_monitor.main --config /etc/network-monitor/config.json discovered --limit 50
+```
+
 ## Default Behavior
 
 - Probe interval: 10 seconds
 - Discovery interval: 5 minutes
+- Discovery method: `auto` (`nmap` if present, otherwise ping scan)
 - Gateway fallback: `192.168.1.254`
 - First upstream hop: `107.220.56.1`
 - Internet ICMP targets: `1.1.1.1`, `8.8.8.8`
 - DNS names: `google.com`, `cloudflare.com`
 - HTTP URL: `https://connectivitycheck.gstatic.com/generate_204`
+
+## Nmap Discovery
+
+If `nmap` is installed on the Pi, the monitor automatically prefers `nmap -sn` when `"discovery_method": "auto"`.
+It falls back to the built-in ping scan if `nmap` is unavailable.
 
 ## Systemd
 

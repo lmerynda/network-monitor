@@ -53,3 +53,18 @@ def print_latest_probes(config: MonitorConfig, cycle_limit: int = 1) -> int:
             f"success={row['success']} latency_ms={row['latency_ms']} details={details}"
         )
     return 0
+
+
+def print_discovered(config: MonitorConfig, limit: int = 50) -> int:
+    db = Database(config.db_path)
+    rows = db.get_discovered_devices_recent(limit=limit)
+    if not rows:
+        print("No discovered devices recorded yet.")
+        return 0
+
+    for row in rows:
+        print(
+            f"{row['last_seen']} {row['address']} name={row['name']} "
+            f"mac={row['mac_address']} kind={row['kind']}"
+        )
+    return 0

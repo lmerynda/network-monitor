@@ -210,3 +210,16 @@ class Database:
             (cycle_limit,),
         )
         return list(cur.fetchall())
+
+    def get_discovered_devices_recent(self, limit: int = 50) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            SELECT name, address, mac_address, kind, source, first_seen, last_seen
+            FROM devices
+            WHERE source = 'discovery'
+            ORDER BY last_seen DESC, address
+            LIMIT ?
+            """,
+            (limit,),
+        )
+        return list(cur.fetchall())

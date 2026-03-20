@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .cli import print_incidents, print_latest_probes, print_status
+from .cli import print_discovered, print_incidents, print_latest_probes, print_status
 from .config import MonitorConfig
 from .monitor import Monitor
 
@@ -29,6 +29,14 @@ def parse_args() -> argparse.Namespace:
         default=1,
         help="How many recent cycles to include",
     )
+
+    discovered_parser = subparsers.add_parser("discovered", help="Show discovered LAN devices")
+    discovered_parser.add_argument(
+        "--limit",
+        type=int,
+        default=50,
+        help="Number of discovered devices to show",
+    )
     return parser.parse_args()
 
 
@@ -44,6 +52,8 @@ def main() -> int:
         return print_incidents(config, limit=args.limit)
     if command == "probes":
         return print_latest_probes(config, cycle_limit=args.cycles)
+    if command == "discovered":
+        return print_discovered(config, limit=args.limit)
 
     monitor = Monitor(config)
     if args.once:

@@ -22,6 +22,7 @@ class MonitorConfig:
     subnet: str = "auto"
     gateway_ip_fallback: str = "192.168.1.254"
     probe_discovered_devices: bool = False
+    discovery_method: str = "auto"
     first_upstream_hop: str = "107.220.56.1"
     internet_icmp: list[str] = field(default_factory=lambda: ["1.1.1.1", "8.8.8.8"])
     dns_names: list[str] = field(default_factory=lambda: ["google.com", "cloudflare.com"])
@@ -57,6 +58,7 @@ class MonitorConfig:
             subnet=str(monitor.get("subnet", "auto")),
             gateway_ip_fallback=str(monitor.get("gateway_ip_fallback", "192.168.1.254")),
             probe_discovered_devices=bool(monitor.get("probe_discovered_devices", False)),
+            discovery_method=str(monitor.get("discovery_method", "auto")),
             first_upstream_hop=str(targets.get("first_upstream_hop", "107.220.56.1")),
             internet_icmp=_as_list(targets, "internet_icmp", ["1.1.1.1", "8.8.8.8"]),
             dns_names=_as_list(targets, "dns_names", ["google.com", "cloudflare.com"]),

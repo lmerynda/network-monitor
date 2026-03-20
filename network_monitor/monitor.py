@@ -177,7 +177,7 @@ class Monitor:
                 for row in rows
             ]
 
-        devices = discover_devices(self.network.subnet)
+        devices = discover_devices(self.network.subnet, method=self.config.discovery_method)
         for device in devices:
             self.db.upsert_device(
                 name=device.name,

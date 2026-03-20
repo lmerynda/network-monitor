@@ -5,7 +5,8 @@
     "discovery_interval_seconds": 300,
     "subnet": "auto",
     "gateway_ip_fallback": "192.168.1.254",
-    "probe_discovered_devices": false
+    "probe_discovered_devices": false,
+    "discovery_method": "auto"
   },
   "targets": {
     "first_upstream_hop": "107.220.56.1",
