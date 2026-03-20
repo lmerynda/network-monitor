@@ -1,0 +1,24 @@
+{
+  "monitor": {
+    "db_path": "data/network-monitor.sqlite3",
+    "interval_seconds": 10,
+    "discovery_interval_seconds": 300,
+    "subnet": "auto",
+    "gateway_ip_fallback": "192.168.1.254",
+    "probe_discovered_devices": false
+  },
+  "targets": {
+    "first_upstream_hop": "107.220.56.1",
+    "internet_icmp": ["1.1.1.1", "8.8.8.8"],
+    "dns_names": ["google.com", "cloudflare.com"],
+    "http_urls": ["https://connectivitycheck.gstatic.com/generate_204"]
+  },
+  "extra_targets": [
+    {
+      "name": "optional-nas",
+      "address": "192.168.1.10",
+      "kind": "extra",
+      "enabled": false
+    }
+  ]
+}

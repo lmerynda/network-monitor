@@ -1,0 +1,15 @@
+[Unit]
+Description=Home network monitor
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/network-monitor
+ExecStart=/usr/bin/python3 -m network_monitor.main --config /opt/network-monitor/config.json
+Restart=always
+RestartSec=5
+User=pi
+
+[Install]
+WantedBy=multi-user.target
