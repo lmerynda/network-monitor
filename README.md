@@ -48,6 +48,14 @@ Install on the Raspberry Pi after copying and unpacking the tarball:
 sudo ./install.sh
 ```
 
+Or deploy directly over SSH from the source machine:
+
+```bash
+./scripts/deploy-over-ssh.sh pi@raspberrypi.local
+```
+
+This is interactive by design. `scp`, `ssh`, and remote `sudo` can prompt for passwords.
+
 The installer:
 
 - copies the app to `/opt/network-monitor`
