@@ -1,6 +1,6 @@
 {
   "monitor": {
-    "db_path": "data/network-monitor.sqlite3",
+    "db_path": "/var/lib/network-monitor/network-monitor.sqlite3",
     "interval_seconds": 10,
     "discovery_interval_seconds": 300,
     "subnet": "auto",

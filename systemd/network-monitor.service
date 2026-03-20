@@ -6,10 +6,11 @@ Wants=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=/opt/network-monitor
-ExecStart=/usr/bin/python3 -m network_monitor.main --config /opt/network-monitor/config.json run
+ExecStart=/usr/bin/python3 -m network_monitor.main --config /etc/network-monitor/config.json run
 Restart=always
 RestartSec=5
-User=pi
+User=network-monitor
+Group=network-monitor
 
 [Install]
 WantedBy=multi-user.target
