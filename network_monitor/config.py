@@ -15,6 +15,16 @@ class ExtraTarget:
 
 
 @dataclass(slots=True)
+class KnownDevice:
+    name: str
+    address: str
+    mac_address: str | None = None
+    kind: str = "known"
+    probe: bool = True
+    enabled: bool = True
+
+
+@dataclass(slots=True)
 class MonitorConfig:
     db_path: Path
     interval_seconds: int = 10
@@ -29,6 +39,7 @@ class MonitorConfig:
     http_urls: list[str] = field(
         default_factory=lambda: ["https://connectivitycheck.gstatic.com/generate_204"]
     )
+    known_devices: list[KnownDevice] = field(default_factory=list)
     extra_targets: list[ExtraTarget] = field(default_factory=list)
 
     @classmethod
@@ -37,6 +48,17 @@ class MonitorConfig:
         raw = json.loads(config_path.read_text(encoding="utf-8"))
         monitor = raw.get("monitor", {})
         targets = raw.get("targets", {})
+        known_devices = [
+            KnownDevice(
+                name=item["name"],
+                address=item["address"],
+                mac_address=item.get("mac_address"),
+                kind=item.get("kind", "known"),
+                probe=item.get("probe", True),
+                enabled=item.get("enabled", True),
+            )
+            for item in raw.get("known_devices", [])
+        ]
         extra_targets = [
             ExtraTarget(
                 name=item["name"],
@@ -67,6 +89,7 @@ class MonitorConfig:
                 "http_urls",
                 ["https://connectivitycheck.gstatic.com/generate_204"],
             ),
+            known_devices=[device for device in known_devices if device.enabled],
             extra_targets=[target for target in extra_targets if target.enabled],
         )
 

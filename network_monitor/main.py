@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from .cli import print_discovered, print_incidents, print_latest_probes, print_status
+from .cli import print_discovered, print_incidents, print_inventory, print_latest_probes, print_status
 from .config import MonitorConfig
 from .dashboard import run_dashboard
 from .monitor import Monitor
@@ -39,6 +39,14 @@ def parse_args() -> argparse.Namespace:
         help="Number of discovered devices to show",
     )
 
+    inventory_parser = subparsers.add_parser("inventory", help="Show merged known and discovered devices")
+    inventory_parser.add_argument(
+        "--limit",
+        type=int,
+        default=100,
+        help="Number of devices to show",
+    )
+
     serve_parser = subparsers.add_parser("serve", help="Run the local dashboard server")
     serve_parser.add_argument("--host", default="0.0.0.0", help="Host/IP to bind")
     serve_parser.add_argument("--port", type=int, default=8080, help="TCP port to bind")
@@ -59,16 +67,21 @@ def main() -> int:
         return print_latest_probes(config, cycle_limit=args.cycles)
     if command == "discovered":
         return print_discovered(config, limit=args.limit)
+    if command == "inventory":
+        return print_inventory(config, limit=args.limit)
     if command == "serve":
         run_dashboard(config, host=args.host, port=args.port)
         return 0
 
     monitor = Monitor(config)
-    if args.once:
-        monitor.run_cycle()
+    try:
+        if args.once:
+            monitor.run_cycle()
+            return 0
+        monitor.run_forever()
         return 0
-    monitor.run_forever()
-    return 0
+    finally:
+        monitor.close()
 
 
 if __name__ == "__main__":

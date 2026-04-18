@@ -190,13 +190,14 @@ def _timeline_payload(db: Database, hours: int) -> dict[str, object]:
 
 def _discovered_payload(db: Database, limit: int) -> dict[str, object]:
     devices = []
-    for row in db.get_discovered_devices_recent(limit=limit):
+    for row in db.get_inventory(limit=limit):
         devices.append(
             {
                 "name": row["name"],
                 "address": row["address"],
                 "mac_address": row["mac_address"],
                 "kind": row["kind"],
+                "source": row["source"],
                 "first_seen": row["first_seen"],
                 "last_seen": row["last_seen"],
             }

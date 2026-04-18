@@ -118,12 +118,13 @@ function renderTimeline(payload) {
 
 function renderDevices(payload) {
   devicesEl.innerHTML = tableHtml(
-    ["Address", "Name", "MAC", "Kind", "Last Seen"],
+    ["Address", "Name", "MAC", "Kind", "Source", "Last Seen"],
     payload.devices.map((item) => [
       item.address,
       item.name,
       item.mac_address || "",
       item.kind,
+      item.source,
       formatTs(item.last_seen)
     ])
   );

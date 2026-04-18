@@ -225,6 +225,35 @@ class Database:
         )
         return list(cur.fetchall())
 
+    def get_inventory(self, limit: int = 100) -> list[sqlite3.Row]:
+        cur = self.conn.execute(
+            """
+            WITH ranked AS (
+                SELECT
+                    name,
+                    address,
+                    mac_address,
+                    kind,
+                    source,
+                    first_seen,
+                    last_seen,
+                    CASE source WHEN 'manual' THEN 0 ELSE 1 END AS source_rank,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY address
+                        ORDER BY CASE source WHEN 'manual' THEN 0 ELSE 1 END, last_seen DESC
+                    ) AS rn
+                FROM devices
+            )
+            SELECT name, address, mac_address, kind, source, first_seen, last_seen
+            FROM ranked
+            WHERE rn = 1
+            ORDER BY source_rank, address
+            LIMIT ?
+            """,
+            (limit,),
+        )
+        return list(cur.fetchall())
+
     def get_latest_cycle(self) -> sqlite3.Row | None:
         cur = self.conn.execute(
             """
@@ -273,4 +302,6 @@ class Database:
         return list(cur.fetchall())
 
     def close(self) -> None:
-        self.conn.close()
+        if self.conn is not None:
+            self.conn.close()
+            self.conn = None

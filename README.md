@@ -91,6 +91,12 @@ Show discovered LAN devices:
 python3 -m network_monitor.main --config /etc/network-monitor/config.json discovered --limit 50
 ```
 
+Show the merged inventory of known and discovered devices:
+
+```bash
+python3 -m network_monitor.main --config /etc/network-monitor/config.json inventory --limit 100
+```
+
 Run the local dashboard server manually:
 
 ```bash
@@ -112,6 +118,11 @@ python3 -m network_monitor.main --config /etc/network-monitor/config.json serve 
 
 If `nmap` is installed on the Pi, the monitor automatically prefers `nmap -sn` when `"discovery_method": "auto"`.
 It falls back to the built-in ping scan if `nmap` is unavailable.
+
+## Known Devices
+
+You can pin important infrastructure and clients in `config.json` using `known_devices`.
+These records are stored with source `manual`, shown by name in the inventory, and can be probed every cycle when `"probe": true`.
 
 ## Systemd
 

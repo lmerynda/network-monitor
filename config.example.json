@@ -14,6 +14,30 @@
     "dns_names": ["google.com", "cloudflare.com"],
     "http_urls": ["https://connectivitycheck.gstatic.com/generate_204"]
   },
+  "known_devices": [
+    {
+      "name": "att_gateway",
+      "address": "192.168.1.254",
+      "kind": "gateway",
+      "probe": true,
+      "enabled": true
+    },
+    {
+      "name": "netgear_device_236",
+      "address": "192.168.1.236",
+      "kind": "infrastructure",
+      "probe": true,
+      "enabled": true
+    },
+    {
+      "name": "lukaszPC",
+      "address": "192.168.1.168",
+      "mac_address": "10:F6:0A:B8:E6:0B",
+      "kind": "client",
+      "probe": false,
+      "enabled": false
+    }
+  ],
   "extra_targets": [
     {
       "name": "optional-nas",

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
 import time
 import uuid
 
@@ -38,6 +37,7 @@ class Monitor:
         now = current_timestamp()
         cycle_id = str(uuid.uuid4())
 
+        self._sync_known_devices(now)
         discovered_targets = self._maybe_refresh_discovery(now)
         static_targets = self._static_targets()
         probe_targets = list(static_targets)
@@ -149,19 +149,34 @@ class Monitor:
         )
 
     def _static_targets(self) -> list[Target]:
-        targets = [
-            Target(name="local-gateway", address=self.network.gateway_ip, kind="gateway"),
-            Target(
-                name="first-upstream-hop",
-                address=self.config.first_upstream_hop,
-                kind="upstream",
-            ),
-        ]
-        targets.extend(
-            Target(name=target.name, address=target.address, kind=target.kind)
-            for target in self.config.extra_targets
+        targets_by_address: dict[str, Target] = {}
+
+        targets_by_address[self.network.gateway_ip] = Target(
+            name="local-gateway",
+            address=self.network.gateway_ip,
+            kind="gateway",
         )
-        return targets
+        targets_by_address[self.config.first_upstream_hop] = Target(
+            name="first-upstream-hop",
+            address=self.config.first_upstream_hop,
+            kind="upstream",
+        )
+
+        for device in self.config.known_devices:
+            if device.probe:
+                targets_by_address[device.address] = Target(
+                    name=device.name,
+                    address=device.address,
+                    kind=device.kind,
+                )
+
+        for target in self.config.extra_targets:
+            targets_by_address[target.address] = Target(
+                name=target.name,
+                address=target.address,
+                kind=target.kind,
+            )
+        return list(targets_by_address.values())
 
     def _maybe_refresh_discovery(self, now: str) -> list[DiscoveredDevice]:
         current = time.monotonic()
@@ -189,3 +204,17 @@ class Monitor:
             )
         self.last_discovery_at = current
         return devices
+
+    def _sync_known_devices(self, now: str) -> None:
+        for device in self.config.known_devices:
+            self.db.upsert_device(
+                name=device.name,
+                address=device.address,
+                mac_address=device.mac_address,
+                kind=device.kind,
+                source="manual",
+                seen_at=now,
+            )
+
+    def close(self) -> None:
+        self.db.close()
